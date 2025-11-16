@@ -110,6 +110,22 @@
       font-style:italic;
     }
 
+    .video-wrap{
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#020617;
+      padding:6px 8px 8px;
+      margin-bottom:10px;
+    }
+    #video{
+      width:100%;
+      max-height:240px;
+      border-radius:8px;
+      background:#000;
+      display:block;
+    }
+
+
     .row-top{
       display:flex;
       justify-content:space-between;
@@ -125,6 +141,8 @@
       gap:8px;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
 </head>
 <body>
   <div class="wrap">
@@ -138,6 +156,10 @@
           📷 Scan QR
         </button>
       </header>
+      <div id="videoWrap" class="video-wrap" style="display:none;">
+        <div class="section-label" style="margin-bottom:6px;">Camera preview</div>
+        <video id="video" playsinline></video>
+      </div>
 
       <div class="row-top">
         <div class="section-label">Raw QR data</div>
@@ -155,21 +177,111 @@
     </div>
   </div>
 
-  <script>
-    // пока НЕТ камеры — просто заглушка
-    const rawBox = document.getElementById('rawBox');
-    const scanBtn = document.getElementById('scanBtn');
-    const mockBtn = document.getElementById('mockBtn');
+    <script>
+    const rawBox   = document.getElementById('rawBox');
+    const scanBtn  = document.getElementById('scanBtn');
+    const mockBtn  = document.getElementById('mockBtn');
+    const videoWrap= document.getElementById('videoWrap');
+    const videoEl  = document.getElementById('video');
 
-    scanBtn.addEventListener('click', () => {
-      alert('На шаге 2 здесь будет запуск камеры и чтение QR.\nПока только UI.');
-    });
+    let stream = null;
+    let scanRaf = null;
+    let scanning = false;
+
+    function setRaw(text){
+      rawBox.textContent = text;
+      rawBox.classList.remove('placeholder');
+    }
+
+    function stopScan(){
+      scanning = false;
+      if (scanRaf) {
+        cancelAnimationFrame(scanRaf);
+        scanRaf = null;
+      }
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+      }
+      if (videoWrap) videoWrap.style.display = 'none';
+      if (scanBtn) {
+        scanBtn.textContent = '📷 Scan QR';
+      }
+    }
+
+    function tickScan(){
+      if (!scanning) return;
+      if (videoEl.readyState === videoEl.HAVE_ENOUGH_DATA) {
+        const w = videoEl.videoWidth;
+        const h = videoEl.videoHeight;
+        if (w && h) {
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(videoEl, 0, 0, w, h);
+          const imgData = ctx.getImageData(0, 0, w, h);
+          const code = jsQR(imgData.data, imgData.width, imgData.height, {
+            inversionAttempts: 'dontInvert'
+          });
+          if (code && code.data) {
+            // нашли QR
+            setRaw(code.data);   // выводим как есть, без парсинга
+            stopScan();
+            return;
+          }
+        }
+      }
+      scanRaf = requestAnimationFrame(tickScan);
+    }
+
+    async function startScan(){
+      if (scanning) {
+        // если уже сканируем — второй клик остановит
+        stopScan();
+        return;
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Camera access is not supported in this browser.');
+        return;
+      }
+
+      try {
+        scanBtn.textContent = '⏹ Stop';
+        rawBox.classList.add('placeholder');
+        rawBox.textContent = 'Scanning… Point the camera at QR code.';
+
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        });
+
+        videoEl.srcObject = stream;
+        videoEl.setAttribute('playsinline', 'true');
+        videoWrap.style.display = 'block';
+
+        await videoEl.play();
+
+        scanning = true;
+        tickScan();
+      } catch (e) {
+        console.error(e);
+        stopScan();
+        alert('Cannot start camera. Check permissions.');
+      }
+    }
+
+    scanBtn.addEventListener('click', startScan);
 
     mockBtn.addEventListener('click', () => {
       const sample = '{"AP1264":[{"label":"030-3","probes":"329,361,330"}],"AP1265":[{"label":"029-6","probes":"429,513,555"}]}';
-      rawBox.textContent = sample;
-      rawBox.classList.remove('placeholder');
+      setRaw(sample);
+    });
+
+    window.addEventListener('beforeunload', () => {
+      stopScan();
     });
   </script>
+
 </body>
 </html>
