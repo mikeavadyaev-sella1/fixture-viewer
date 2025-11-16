@@ -1,2 +1,175 @@
 <!doctype html>
-<html><body><h1>Fixture Viewer</h1></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Fixture QR Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0f172a;
+      --card:#111827;
+      --accent:#22c55e;
+      --accent2:#38bdf8;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --border:#1f2937;
+    }
+
+    *{box-sizing:border-box;}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:radial-gradient(circle at top, #1e293b, #020617);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      color:var(--text);
+    }
+
+    .wrap{
+      width:100%;
+      max-width:480px;
+      padding:16px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:16px;
+      border:1px solid var(--border);
+      padding:20px 18px 18px;
+      box-shadow:0 18px 40px rgba(0,0,0,.6);
+    }
+
+    .card header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:14px;
+    }
+
+    .title{
+      font-size:18px;
+      font-weight:600;
+    }
+
+    .subtitle{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    button{
+      padding:8px 14px;
+      border-radius:999px;
+      border:1px solid var(--accent);
+      background:transparent;
+      color:var(--accent);
+      font:inherit;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    button:active{
+      transform:translateY(1px);
+    }
+
+    .btn-small{
+      padding:4px 10px;
+      font-size:12px;
+      border-color:var(--accent2);
+      color:var(--accent2);
+    }
+
+    .section-label{
+      font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-bottom:4px;
+    }
+
+    .box{
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#020617;
+      padding:8px 10px;
+      font-size:12px;
+      min-height:56px;
+      max-height:220px;
+      overflow:auto;
+      white-space:pre-wrap;
+      word-break:break-all;
+    }
+
+    .box.placeholder{
+      color:var(--muted);
+      font-style:italic;
+    }
+
+    .row-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:10px;
+    }
+
+    .footer{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:10px;
+      gap:8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div>
+          <div class="title">Fixture QR Viewer</div>
+          <div class="subtitle">Step 1 · UI only (no scan yet)</div>
+        </div>
+        <button id="scanBtn" type="button">
+          📷 Scan QR
+        </button>
+      </header>
+
+      <div class="row-top">
+        <div class="section-label">Raw QR data</div>
+        <button id="mockBtn" class="btn-small" type="button">Test sample</button>
+      </div>
+      <div id="rawBox" class="box placeholder">
+        No data yet. Point the camera to QR (will be implemented on next step) or press “Test sample”.
+      </div>
+
+      <div class="footer">
+        <span style="font-size:11px;color:var(--muted);">
+          Camera & real scan will be added on step 2
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // пока НЕТ камеры — просто заглушка
+    const rawBox = document.getElementById('rawBox');
+    const scanBtn = document.getElementById('scanBtn');
+    const mockBtn = document.getElementById('mockBtn');
+
+    scanBtn.addEventListener('click', () => {
+      alert('На шаге 2 здесь будет запуск камеры и чтение QR.\nПока только UI.');
+    });
+
+    mockBtn.addEventListener('click', () => {
+      const sample = '{"AP1264":[{"label":"030-3","probes":"329,361,330"}],"AP1265":[{"label":"029-6","probes":"429,513,555"}]}';
+      rawBox.textContent = sample;
+      rawBox.classList.remove('placeholder');
+    });
+  </script>
+</body>
+</html>
