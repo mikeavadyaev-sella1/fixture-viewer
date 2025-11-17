@@ -17,71 +17,79 @@
 
     *{box-sizing:border-box;}
 
-    body{
+    html,body{
       margin:0;
       min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    }
+
+    body{
       background:radial-gradient(circle at top, #1e293b, #020617);
       font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
       color:var(--text);
+      display:flex;
+      justify-content:center;
+      padding:14px;
     }
 
     .wrap{
       width:100%;
-      max-width:480px;
-      padding:16px;
-    }
-
-    .card{
-      background:var(--card);
-      border-radius:16px;
-      border:1px solid var(--border);
-      padding:20px 18px 18px;
-      box-shadow:0 18px 40px rgba(0,0,0,.6);
-    }
-
-    .card header{
+      max-width:520px;
       display:flex;
-      justify-content:space-between;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    /* === MENU BAR === */
+    .menu-bar{
+      display:flex;
+      gap:8px;
       align-items:center;
-      margin-bottom:14px;
+      padding:8px 10px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(15,23,42,0.95);
+      box-shadow:0 16px 40px rgba(0,0,0,.4);
     }
 
-    .title{
-      font-size:18px;
-      font-weight:600;
-    }
-
-    .subtitle{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:2px;
-    }
-
-    button{
-      padding:8px 14px;
+    .menu-btn{
+      padding:6px 12px;
       border-radius:999px;
-      border:1px solid var(--accent);
-      background:transparent;
-      color:var(--accent);
-      font:inherit;
+      border:1px solid var(--accent2);
+      background:#020617;
+      color:var(--accent2);
+      font-size:13px;
       cursor:pointer;
       display:inline-flex;
       align-items:center;
       gap:6px;
+      white-space:nowrap;
     }
 
-    button:active{
-      transform:translateY(1px);
+    .menu-btn:active{ transform:translateY(1px); }
+
+    .menu-select{
+      flex:1;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#020617;
+      color:var(--text);
+      font-size:13px;
+      outline:none;
     }
 
-    .btn-small{
-      padding:4px 10px;
-      font-size:12px;
-      border-color:var(--accent2);
-      color:var(--accent2);
+    .menu-select:disabled{
+      opacity:.6;
+      color:var(--muted);
+    }
+
+    /* === VIEWER === */
+    .viewer-shell{
+      border-radius:16px;
+      border:1px solid var(--border);
+      background:#111827;
+      padding:14px 14px 12px;
+      box-shadow:0 18px 40px rgba(0,0,0,.55);
     }
 
     .section-label{
@@ -89,17 +97,114 @@
       color:var(--muted);
       text-transform:uppercase;
       letter-spacing:.08em;
-      margin-bottom:4px;
+      margin-bottom:6px;
+    }
+
+    .viewer-row{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+      font-size:13px;
+    }
+
+    .viewer-label{
+      width:60px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .viewer-name{
+      flex:1;
+      font-weight:500;
+      color:var(--text);
+      min-height:18px;
+    }
+
+    .viewer-input{
+      flex:1;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid var(--border);
+      background:#020617;
+      color:var(--text);
+      font-size:13px;
+      outline:none;
+    }
+
+    .viewer-info{
+      margin-top:4px;
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    /* === SCAN MODAL === */
+    .scan-backdrop{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,0.7);
+      z-index:1000;
+    }
+
+    .scan-card{
+      width:100%;
+      max-width:480px;
+      background:#111827;
+      border-radius:16px;
+      border:1px solid var(--border);
+      box-shadow:0 20px 60px rgba(0,0,0,.8);
+      padding:14px 14px 12px;
+    }
+
+    .scan-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:8px;
+    }
+
+    .scan-title{
+      font-size:16px;
+      font-weight:600;
+    }
+
+    .scan-close{
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      cursor:pointer;
+      font-size:18px;
+      line-height:1;
+      padding:2px 4px;
+    }
+
+    .video-wrap{
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#020617;
+      padding:6px 8px 8px;
+      margin-bottom:8px;
+    }
+
+    #video{
+      width:100%;
+      max-height:240px;
+      border-radius:8px;
+      background:#000;
+      display:block;
     }
 
     .box{
       border-radius:10px;
       border:1px solid var(--border);
       background:#020617;
-      padding:8px 10px;
-      font-size:12px;
-      min-height:56px;
-      max-height:220px;
+      padding:6px 8px;
+      font-size:11px;
+      min-height:42px;
+      max-height:120px;
       overflow:auto;
       white-space:pre-wrap;
       word-break:break-all;
@@ -110,152 +215,115 @@
       font-style:italic;
     }
 
-    .video-wrap{
-      border-radius:10px;
-      border:1px solid var(--border);
-      background:#020617;
-      padding:6px 8px 8px;
-      margin-bottom:10px;
-    }
-    #video{
-      width:100%;
-      max-height:240px;
-      border-radius:8px;
-      background:#000;
-      display:block;
-    }
-
-
-    .row-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:8px;
-      margin-bottom:10px;
-    }
-
-    .footer{
+    .scan-footer{
+      margin-top:8px;
       display:flex;
       justify-content:flex-end;
-      margin-top:10px;
       gap:8px;
     }
-    .viewer-shell{
-      margin-top:16px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:#020617;
-      padding:10px;
-    }
-    .viewer-frame{
-      width:100%;
-      height:320px;          /* можно потом подправить */
-      border:none;
-      border-radius:10px;
-      background:#020617;
-      display:block;
-    }
-    .viewer-info{
-      margin-top:6px;
-      font-size:11px;
-      color:var(--muted);
-    }
-    .menu-bar{
-      margin-top:12px;
-      margin-bottom:6px;
-      display:flex;
-      gap:8px;
-    }
-    .menu-btn{
+
+    .scan-btn{
       padding:6px 12px;
       border-radius:999px;
-      border:1px solid var(--border);
+      border:1px solid var(--accent);
       background:#020617;
-      color:var(--muted);
-      font:12px system-ui, sans-serif;
+      color:var(--accent);
+      font-size:13px;
       cursor:pointer;
     }
-    .menu-btn-active{
-      border-color:var(--accent2);
-      color:var(--accent2);
-      background:rgba(56,189,248,0.08);
+
+    .scan-btn-secondary{
+      border-color:var(--border);
+      color:var(--muted);
     }
 
+    .scan-btn:active{
+      transform:translateY(1px);
+    }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
+  <!-- библиотека для чтения QR -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
 <body>
   <div class="wrap">
-    <div class="card">
-      <header>
+    <!-- MENU BAR -->
+    <div class="menu-bar">
+      <button id="menuScan" class="menu-btn" type="button">
+        📷 Scan QR
+      </button>
+      <select id="viewerSelect" class="menu-select" disabled>
+        <option value="">No viewers yet</option>
+      </select>
+    </div>
+
+    <!-- VIEWER -->
+    <div class="viewer-shell">
+      <div class="section-label">Viewer</div>
+
+      <div class="viewer-row">
+        <div class="viewer-label">Name</div>
+        <div id="viewerName" class="viewer-name">—</div>
+      </div>
+
+      <div class="viewer-row">
+        <label for="probesInput" class="viewer-label">Probes</label>
+        <input id="probesInput" class="viewer-input" type="text" readonly />
+      </div>
+
+      <div id="viewerInfo" class="viewer-info">
+        Scan QR to fill dropdown with entries like AP1264-030-3, AP1264-030-5…  
+        Selecting an item will show its probes in the field above.
+      </div>
+    </div>
+  </div>
+
+  <!-- SCAN MODAL -->
+  <div id="scanModal" class="scan-backdrop">
+    <div class="scan-card">
+      <div class="scan-header">
         <div>
-          <div class="title">Fixture QR Viewer</div>
-          <div class="subtitle">Step 2 · QR scan + viewer by JSON key (no scan yet)</div>
+          <div class="scan-title">Scan QR</div>
+          <div style="font-size:11px;color:var(--muted);">Point the camera at QR code with JSON.</div>
         </div>
-        <button id="scanBtn" type="button">
-          📷 Scan QR
-        </button>
-      </header>
-      <div id="videoWrap" class="video-wrap" style="display:none;">
-        <div class="section-label" style="margin-bottom:6px;">Camera preview</div>
+        <button id="scanClose" class="scan-close" type="button">×</button>
+      </div>
+
+      <div class="video-wrap">
+        <div class="section-label" style="margin-bottom:4px;">Camera</div>
         <video id="video" playsinline></video>
       </div>
 
-      <div class="row-top">
-        <div class="section-label">Raw QR data</div>
-        <button id="mockBtn" class="btn-small" type="button">Test sample</button>
-      </div>
+      <div class="section-label" style="margin-bottom:4px;">Raw QR data</div>
       <div id="rawBox" class="box placeholder">
-        No data yet. Point the camera to QR (will be implemented on next step) or press “Test sample”.
+        Waiting for camera…
       </div>
 
-      <div class="footer">
-        <span style="font-size:11px;color:var(--muted);">
-          Camera & real scan will be added on step 2
-        </span>
+      <div class="scan-footer">
+        <button id="scanStop" class="scan-btn scan-btn-secondary" type="button">Stop</button>
       </div>
     </div>
-    <div class="menu-bar">
-      <button id="menuScan" class="menu-btn menu-btn-active" type="button">
-        QR scan
-      </button>
-      <!-- здесь потом появятся другие кнопки-вьюверы -->
-    </div>
-
-    <div class="viewer-shell">
-      <div class="section-label">Viewer</div>
-      <iframe id="viewerFrame" class="viewer-frame" src="" title="Fixture viewer"></iframe>
-      <div id="viewerInfo" class="viewer-info">
-        No viewer loaded. Scan QR to open viewer (first JSON key → &lt;key&gt;.html).
-      </div>
-    </div>
-
   </div>
 
-      <script>
-    const rawBox    = document.getElementById('rawBox');
-    const scanBtn   = document.getElementById('scanBtn');
-    const mockBtn   = document.getElementById('mockBtn');
-    const videoWrap = document.getElementById('videoWrap');
-    const videoEl   = document.getElementById('video');
+  <script>
+    const rawBox       = document.getElementById('rawBox');
+    const menuScanBtn  = document.getElementById('menuScan');
+    const scanModal    = document.getElementById('scanModal');
+    const scanCloseBtn = document.getElementById('scanClose');
+    const scanStopBtn  = document.getElementById('scanStop');
+    const videoEl      = document.getElementById('video');
 
-    const viewerFrame = document.getElementById('viewerFrame');
-    const viewerInfo  = document.getElementById('viewerInfo');
-    const menuScan = document.getElementById('menuScan');
-    const cardEl   = document.querySelector('.card');
+    const viewerSelect = document.getElementById('viewerSelect');
+    const viewerNameEl = document.getElementById('viewerName');
+    const probesInput  = document.getElementById('probesInput');
+    const viewerInfo   = document.getElementById('viewerInfo');
 
-    if (menuScan && cardEl) {
-      menuScan.addEventListener('click', () => {
-        // на будущее это будет переключатель режимов,
-        // пока просто скроллим к блоку сканера
-        cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    }
-
-    let stream  = null;
-    let scanRaf = null;
+    let stream   = null;
+    let scanRaf  = null;
     let scanning = false;
+
+    // map: "AP1264-030-3" -> { id, key, label, probes }
+    const viewerMap = {};
 
     function setRaw(text){
       rawBox.textContent = text;
@@ -266,28 +334,74 @@
       if (viewerInfo) viewerInfo.textContent = msg;
     }
 
-    function loadViewerFromJson(rawText){
-      if (!viewerFrame) return;
+    function clearViewerList(){
+      Object.keys(viewerMap).forEach(k => delete viewerMap[k]);
+      viewerSelect.innerHTML = '<option value="">No viewers yet</option>';
+      viewerSelect.disabled = true;
+      viewerNameEl.textContent = '—';
+      probesInput.value = '';
+      setViewerMessage('Scan QR to fill dropdown with entries like AP1264-030-3, AP1264-030-5…');
+    }
 
+    function buildViewerListFromJson(rawText){
       let obj;
       try {
         obj = JSON.parse(rawText);
       } catch (e) {
-        setViewerMessage('QR data is not valid JSON, viewer not loaded.');
+        setViewerMessage('QR data is not valid JSON, viewer list not built.');
+        clearViewerList();
         return;
       }
+
+      clearViewerList();
 
       const keys = Object.keys(obj);
       if (!keys.length) {
-        setViewerMessage('JSON has no top-level keys, viewer not loaded.');
+        setViewerMessage('JSON has no top-level keys, viewer list not built.');
         return;
       }
 
-      const viewerId = keys[0];             // имя первого вьювера
-      const fileName = viewerId + '.html';  // <ключ>.html
+      const options = [];
+      keys.forEach(key => {
+        const arr = obj[key];
+        if (!Array.isArray(arr)) return;
+        arr.forEach(item => {
+          const label  = (item && (item.label ?? item.l)) || '';
+          const probes = (item && (item.probes ?? item.p)) || '';
+          if (!label || !probes) return;
+          const id = `${key}-${label}`;
+          viewerMap[id] = { id, key, label, probes };
+          options.push(id);
+        });
+      });
 
-      viewerFrame.src = fileName;
-      setViewerMessage('Viewer: ' + fileName);
+      if (!options.length) {
+        setViewerMessage('No suitable entries found in JSON (need {label, probes}).');
+        return;
+      }
+
+      viewerSelect.innerHTML = '<option value="">Select viewer…</option>';
+      options.forEach(id => {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = id;
+        viewerSelect.appendChild(opt);
+      });
+      viewerSelect.disabled = false;
+
+      setViewerMessage('Select an item in dropdown to see its probes.');
+    }
+
+    function onViewerSelectChange(){
+      const id = viewerSelect.value;
+      if (!id || !viewerMap[id]) {
+        viewerNameEl.textContent = '—';
+        probesInput.value = '';
+        return;
+      }
+      const item = viewerMap[id];
+      viewerNameEl.textContent = item.id;
+      probesInput.value = item.probes;
     }
 
     function stopScan(){
@@ -300,10 +414,17 @@
         stream.getTracks().forEach(t => t.stop());
         stream = null;
       }
-      if (videoWrap) videoWrap.style.display = 'none';
-      if (scanBtn) {
-        scanBtn.textContent = '📷 Scan QR';
-      }
+    }
+
+    function closeScanModal(){
+      stopScan();
+      if (scanModal) scanModal.style.display = 'none';
+    }
+
+    function openScanModal(){
+      if (!scanModal) return;
+      scanModal.style.display = 'flex';
+      startScan();
     }
 
     function tickScan(){
@@ -322,11 +443,10 @@
             inversionAttempts: 'dontInvert'
           });
           if (code && code.data) {
-            // нашли QR
             const text = code.data;
-            setRaw(text);              // показать как есть
-            loadViewerFromJson(text);  // загрузить <первый ключ>.html во фрейм
-            stopScan();
+            setRaw(text);                // показываем сырые данные
+            buildViewerListFromJson(text); // строим список APxxxx-xxxx
+            closeScanModal();           // закрываем окно сканера
             return;
           }
         }
@@ -336,8 +456,7 @@
 
     async function startScan(){
       if (scanning) {
-        // повторный клик остановит сканирование
-        stopScan();
+        // если вдруг уже идёт скан — просто не запускаем второй раз
         return;
       }
 
@@ -347,7 +466,6 @@
       }
 
       try {
-        scanBtn.textContent = '⏹ Stop';
         rawBox.classList.add('placeholder');
         rawBox.textContent = 'Scanning… Point the camera at QR code.';
 
@@ -357,7 +475,6 @@
 
         videoEl.srcObject = stream;
         videoEl.setAttribute('playsinline', 'true');
-        videoWrap.style.display = 'block';
 
         await videoEl.play();
 
@@ -366,23 +483,33 @@
       } catch (e) {
         console.error(e);
         stopScan();
-        alert('Cannot start camera. Check permissions.');
+        rawBox.classList.add('placeholder');
+        rawBox.textContent = 'Cannot start camera. Check permissions.';
       }
     }
 
-    scanBtn.addEventListener('click', startScan);
-
-    mockBtn.addEventListener('click', () => {
-      const sample = '{"AP1264":[{"label":"030-3","probes":"329,361,330"}],"AP1265":[{"label":"029-6","probes":"429,513,555"}]}';
-      setRaw(sample);
-      loadViewerFromJson(sample);
+    // === EVENTS ===
+    menuScanBtn.addEventListener('click', () => {
+      openScanModal();
     });
+
+    scanCloseBtn.addEventListener('click', () => {
+      closeScanModal();
+    });
+
+    scanStopBtn.addEventListener('click', () => {
+      closeScanModal();
+    });
+
+    viewerSelect.addEventListener('change', onViewerSelectChange);
 
     window.addEventListener('beforeunload', () => {
       stopScan();
     });
+
+    // начальное состояние
+    clearViewerList();
   </script>
-
-
 </body>
 </html>
+
