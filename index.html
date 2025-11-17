@@ -140,6 +140,27 @@
       margin-top:10px;
       gap:8px;
     }
+    .viewer-shell{
+      margin-top:16px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#020617;
+      padding:10px;
+    }
+    .viewer-frame{
+      width:100%;
+      height:320px;          /* можно потом подправить */
+      border:none;
+      border-radius:10px;
+      background:#020617;
+      display:block;
+    }
+    .viewer-info{
+      margin-top:6px;
+      font-size:11px;
+      color:var(--muted);
+    }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
@@ -150,7 +171,7 @@
       <header>
         <div>
           <div class="title">Fixture QR Viewer</div>
-          <div class="subtitle">Step 1 · UI only (no scan yet)</div>
+          <div class="subtitle">Step 2 · QR scan + viewer by JSON key (no scan yet)</div>
         </div>
         <button id="scanBtn" type="button">
           📷 Scan QR
@@ -175,22 +196,61 @@
         </span>
       </div>
     </div>
+    <div class="viewer-shell">
+      <div class="section-label">Viewer</div>
+      <iframe id="viewerFrame" class="viewer-frame" src="" title="Fixture viewer"></iframe>
+      <div id="viewerInfo" class="viewer-info">
+        No viewer loaded. Scan QR to open viewer (first JSON key → &lt;key&gt;.html).
+      </div>
+    </div>
+
   </div>
 
-    <script>
-    const rawBox   = document.getElementById('rawBox');
-    const scanBtn  = document.getElementById('scanBtn');
-    const mockBtn  = document.getElementById('mockBtn');
-    const videoWrap= document.getElementById('videoWrap');
-    const videoEl  = document.getElementById('video');
+      <script>
+    const rawBox    = document.getElementById('rawBox');
+    const scanBtn   = document.getElementById('scanBtn');
+    const mockBtn   = document.getElementById('mockBtn');
+    const videoWrap = document.getElementById('videoWrap');
+    const videoEl   = document.getElementById('video');
 
-    let stream = null;
+    const viewerFrame = document.getElementById('viewerFrame');
+    const viewerInfo  = document.getElementById('viewerInfo');
+
+    let stream  = null;
     let scanRaf = null;
     let scanning = false;
 
     function setRaw(text){
       rawBox.textContent = text;
       rawBox.classList.remove('placeholder');
+    }
+
+    function setViewerMessage(msg){
+      if (viewerInfo) viewerInfo.textContent = msg;
+    }
+
+    function loadViewerFromJson(rawText){
+      if (!viewerFrame) return;
+
+      let obj;
+      try {
+        obj = JSON.parse(rawText);
+      } catch (e) {
+        setViewerMessage('QR data is not valid JSON, viewer not loaded.');
+        return;
+      }
+
+      const keys = Object.keys(obj);
+      if (!keys.length) {
+        setViewerMessage('JSON has no top-level keys, viewer not loaded.');
+        return;
+      }
+
+      const viewerId = keys[0];             // имя первого вьювера
+      const fileName = viewerId + '.html';  // <ключ>.html
+
+      viewerFrame.src = fileName;
+      setViewerMessage('Viewer: ' + fileName);
     }
 
     function stopScan(){
@@ -226,7 +286,9 @@
           });
           if (code && code.data) {
             // нашли QR
-            setRaw(code.data);   // выводим как есть, без парсинга
+            const text = code.data;
+            setRaw(text);              // показать как есть
+            loadViewerFromJson(text);  // загрузить <первый ключ>.html во фрейм
             stopScan();
             return;
           }
@@ -237,7 +299,7 @@
 
     async function startScan(){
       if (scanning) {
-        // если уже сканируем — второй клик остановит
+        // повторный клик остановит сканирование
         stopScan();
         return;
       }
@@ -276,12 +338,14 @@
     mockBtn.addEventListener('click', () => {
       const sample = '{"AP1264":[{"label":"030-3","probes":"329,361,330"}],"AP1265":[{"label":"029-6","probes":"429,513,555"}]}';
       setRaw(sample);
+      loadViewerFromJson(sample);
     });
 
     window.addEventListener('beforeunload', () => {
       stopScan();
     });
   </script>
+
 
 </body>
 </html>
