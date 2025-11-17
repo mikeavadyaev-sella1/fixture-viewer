@@ -470,18 +470,41 @@
     }
 
     function sendProbesToFixture(probes){
-      if (!viewerFrame || !viewerFrame.contentWindow) return;
-      try {
-        const doc = viewerFrame.contentWindow.document;
-        if (!doc) return;
-        const input = doc.getElementById('probeInput');
-        if (!input) return;
-        input.value = probes;
-        input.dispatchEvent(new Event("change", { bubbles: true })); // 💡 сгенерировать событие change
-      } catch (e) {
-        console.warn('Cannot access probeInput inside iframe:', e);
-      }
+  if (!viewerFrame || !viewerFrame.contentWindow) return;
+  try {
+    const doc = viewerFrame.contentWindow.document;
+    if (!doc) return;
+    const input = doc.getElementById('probeInput');
+    if (!input) return;
+
+    // ставим значение
+    input.value = probes;
+
+    // максимально имитируем ручной ввод
+    try {
+      const evInit = { bubbles: true, cancelable: true };
+
+      // событие input
+      input.dispatchEvent(new Event("input", evInit));
+
+      // событие change
+      input.dispatchEvent(new Event("change", evInit));
+    } catch(e2){
+      // fallback для старых движков (не должен понадобиться, но пусть будет)
+      const evtInput  = doc.createEvent("HTMLEvents");
+      evtInput.initEvent("input", true, true);
+      input.dispatchEvent(evtInput);
+
+      const evtChange = doc.createEvent("HTMLEvents");
+      evtChange.initEvent("change", true, true);
+      input.dispatchEvent(evtChange);
     }
+
+  } catch (e) {
+    console.warn('Cannot access probeInput inside iframe:', e);
+  }
+}
+
 
     function onViewerSelectChange(){
       const v = viewerSelect.value;
