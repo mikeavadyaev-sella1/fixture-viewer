@@ -477,6 +477,7 @@
         const input = doc.getElementById('probeInput');
         if (!input) return;
         input.value = probes;
+        input.dispatchEvent(new Event("change", { bubbles: true })); // 💡 сгенерировать событие change
       } catch (e) {
         console.warn('Cannot access probeInput inside iframe:', e);
       }
