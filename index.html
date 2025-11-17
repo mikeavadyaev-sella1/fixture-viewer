@@ -31,14 +31,17 @@
       padding:14px;
     }
 
-    .wrap{
-      width:100%;
-      max-width:520px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      position:relative;
-    }
+.wrap{
+  width:100%;
+  max-width:520px;
+  height:100vh;        /* ← добавили */
+  overflow:hidden;     /* ← добавили */
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  position:relative;
+}
+
 
     /* === MENU BAR === */
     .menu-bar{
@@ -109,14 +112,23 @@
       letter-spacing:.08em;
     }
 
-    .viewer-frame{
-      width:100%;
-      height:100vh;          /* основное поле экрана 55vh*/
-      border:none;
-      border-radius:10px;
-      background:#020617;
-      display:block;
-    }
+.viewer-shell{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-height:0; /* важно для корректного flex-скролла */
+}
+
+.viewer-frame{
+  flex:1 1 auto;       /* ← тянет iframe вниз */
+  width:100%;
+  border:none;
+  border-radius:10px;
+  background:#020617;
+  display:block;
+  min-height:0;        /* ← предотвращает переполнение */
+}
 
     .viewer-info{
       font-size:11px;
