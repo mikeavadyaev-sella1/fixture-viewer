@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Fixture QR Viewer</title>
+  <title>Fixture Viewer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
     :root{
       --bg:#0f172a;
@@ -19,7 +20,8 @@
 
     html,body{
       margin:0;
-      min-height:100vh;
+      padding:0;
+      height:100%;
     }
 
     body{
@@ -28,57 +30,66 @@
       color:var(--text);
       display:flex;
       justify-content:center;
-      padding:14px;
+      padding:10px;
+      overflow:hidden;
     }
 
-.wrap{
-  width:100%;
-  max-width:520px;
-  height:100vh;        /* ← добавили */
-  overflow:hidden;     /* ← добавили */
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  position:relative;
-}
-
+    .wrap{
+      width:100%;
+      max-width:520px;
+      height:100vh;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      position:relative;
+    }
 
     /* === MENU BAR === */
     .menu-bar{
       display:flex;
       flex-direction:column;
       gap:6px;
-      padding:8px 10px;
+      padding:6px 8px;
       border-radius:14px;
       border:1px solid var(--border);
       background:rgba(15,23,42,0.95);
       box-shadow:0 16px 40px rgba(0,0,0,.4);
+      flex:0 0 auto;
     }
 
     .menu-top{
       display:flex;
-      gap:8px;
-      align-items:center;
-    }
-
-    .menu-btn{
-      padding:6px 12px;
-      border-radius:999px;
-      border:1px solid var(--accent2);
-      background:#020617;
-      color:var(--accent2);
-      font-size:13px;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
       gap:6px;
-      white-space:nowrap;
+      align-items:center;
     }
 
-    .menu-btn:active{ transform:translateY(1px); }
+    .menu-icon-btn{
+      width:38px;
+      height:38px;
+      padding:4px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#020617;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+
+    .menu-icon-btn img{
+      max-width:100%;
+      max-height:100%;
+      display:block;
+    }
+
+    .menu-icon-btn:active{
+      transform:translateY(1px);
+    }
 
     .menu-select{
-      flex:1;
+      flex:1 1 auto;
       padding:6px 10px;
       border-radius:999px;
       border:1px solid var(--border);
@@ -86,9 +97,9 @@
       color:var(--text);
       font-size:13px;
       outline:none;
+      min-width:0;
     }
 
-    /* manual selection — голубой текст, если браузер позволит */
     .menu-select option[value="manual"]{
       color:var(--accent2);
     }
@@ -98,37 +109,24 @@
       border-radius:16px;
       border:1px solid var(--border);
       background:#111827;
-      padding:10px 10px 12px;
+      padding:8px 8px 10px;
       box-shadow:0 18px 40px rgba(0,0,0,.55);
       display:flex;
       flex-direction:column;
       gap:6px;
+      flex:1 1 auto;
+      min-height:0;
     }
 
-    .section-label{
-      font-size:12px;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.08em;
+    .viewer-frame{
+      flex:1 1 auto;
+      width:100%;
+      border:none;
+      border-radius:10px;
+      background:#020617;
+      display:block;
+      min-height:0;
     }
-
-.viewer-shell{
-  flex:1 1 auto;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  min-height:0; /* важно для корректного flex-скролла */
-}
-
-.viewer-frame{
-  flex:1 1 auto;       /* ← тянет iframe вниз */
-  width:100%;
-  border:none;
-  border-radius:10px;
-  background:#020617;
-  display:block;
-  min-height:0;        /* ← предотвращает переполнение */
-}
 
     .viewer-info{
       font-size:11px;
@@ -238,10 +236,10 @@
       transform:translateY(1px);
     }
 
-    /* === MANUAL POPUP (dropdown-like) === */
+    /* === MANUAL POPUP === */
     .manual-popup{
       position:absolute;
-      top:70px;          /* примерно под меню */
+      top:64px;
       right:12px;
       min-width:220px;
       background:#020617;
@@ -280,11 +278,69 @@
     .manual-item:hover{
       background:#111827;
     }
+
+    /* === SHARE MODAL (QR с ссылкой на приложение) === */
+    #shareModal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,0.75);
+      z-index:1500;
+    }
+
+    .share-card{
+      background:#111827;
+      border-radius:14px;
+      border:1px solid var(--border);
+      padding:14px 16px 12px;
+      text-align:center;
+      max-width:260px;
+      width:100%;
+      box-shadow:0 20px 50px rgba(0,0,0,0.8);
+    }
+
+    .share-title{
+      font-size:14px;
+      font-weight:500;
+      margin-bottom:8px;
+    }
+
+    .share-sub{
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
+
+    #shareQrCanvas{
+      display:block;
+      margin:0 auto 10px;
+      border-radius:10px;
+      background:#ffffff;
+    }
+
+    #closeShareBtn{
+      padding:6px 14px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#020617;
+      color:var(--text);
+      font-size:13px;
+      cursor:pointer;
+    }
+
+    #closeShareBtn:active{
+      transform:translateY(1px);
+    }
   </style>
 
-  <!-- библиотека для чтения QR -->
+  <!-- jsQR для чтения QR JSON -->
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-   <!-- PWA -->
+  <!-- QRious для генерации QR ссылки на приложение -->
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+
+  <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#020617">
   <meta name="mobile-web-app-capable" content="yes">
@@ -296,12 +352,24 @@
     <!-- MENU BAR -->
     <div class="menu-bar">
       <div class="menu-top">
-        <button id="menuScan" class="menu-btn" type="button">
-          📷 Scan QR
+        <!-- Scan QR (JSON для fixtures) -->
+        <button id="btnScan" class="menu-icon-btn" type="button" aria-label="Scan QR">
+          <img src="qr.png" alt="Scan">
         </button>
+
         <select id="viewerSelect" class="menu-select">
-          <!-- наполняется скриптом -->
+          <!-- заполняется скриптом -->
         </select>
+
+        <!-- Share app link via QR -->
+        <button id="btnShare" class="menu-icon-btn" type="button" aria-label="Share app">
+          <img src="share.png" alt="Share">
+        </button>
+
+        <!-- Exit PWA -->
+        <button id="btnExit" class="menu-icon-btn" type="button" aria-label="Exit app">
+          <img src="exi.png" alt="Exit">
+        </button>
       </div>
     </div>
 
@@ -309,7 +377,7 @@
     <div class="viewer-shell">
       <iframe id="viewerFrame" class="viewer-frame" src="" title="Fixture viewer"></iframe>
       <div id="viewerInfo" class="viewer-info">
-        No fixture loaded. Use manual selection to pick fixtures/&lt;name&gt;.html, then QR entries will send probes into probeInput.
+        No fixture loaded. Use manual selection to pick fixtures/&lt;name&gt;.html, then QR entries to send probes into probeInput.
       </div>
     </div>
 
@@ -322,23 +390,23 @@
     </div>
   </div>
 
-  <!-- SCAN MODAL -->
+  <!-- SCAN MODAL (камера для JSON QR) -->
   <div id="scanModal" class="scan-backdrop">
     <div class="scan-card">
       <div class="scan-header">
         <div>
           <div class="scan-title">Scan QR</div>
-          <div style="font-size:11px;color:var(--muted);">Point the camera at QR code with JSON.</div>
+          <div style="font-size:11px;color:var(--muted);">Point the camera at QR code with JSON for fixtures.</div>
         </div>
         <button id="scanClose" class="scan-close" type="button">×</button>
       </div>
 
       <div class="video-wrap">
-        <div class="section-label" style="margin-bottom:4px;">Camera</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Camera</div>
         <video id="video" playsinline></video>
       </div>
 
-      <div class="section-label" style="margin-bottom:4px;">Raw QR data</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Raw QR data</div>
       <div id="rawBox" class="box placeholder">
         Waiting for camera…
       </div>
@@ -349,13 +417,26 @@
     </div>
   </div>
 
+  <!-- SHARE MODAL (QR со ссылкой на приложение) -->
+  <div id="shareModal">
+    <div class="share-card">
+      <div class="share-title">Share Fixture Viewer</div>
+      <div class="share-sub">Scan this QR to open and install the app.</div>
+      <canvas id="shareQrCanvas" width="240" height="240"></canvas>
+      <button id="closeShareBtn" type="button">Close</button>
+    </div>
+  </div>
+
   <script>
     const rawBox       = document.getElementById('rawBox');
-    const menuScanBtn  = document.getElementById('menuScan');
     const scanModal    = document.getElementById('scanModal');
     const scanCloseBtn = document.getElementById('scanClose');
     const scanStopBtn  = document.getElementById('scanStop');
     const videoEl      = document.getElementById('video');
+
+    const btnScan      = document.getElementById('btnScan');
+    const btnShare     = document.getElementById('btnShare');
+    const btnExit      = document.getElementById('btnExit');
 
     const viewerSelect = document.getElementById('viewerSelect');
     const viewerFrame  = document.getElementById('viewerFrame');
@@ -363,6 +444,10 @@
 
     const manualPopup  = document.getElementById('manualPopup');
     const manualList   = document.getElementById('manualList');
+
+    const shareModal   = document.getElementById('shareModal');
+    const shareQrCanvas= document.getElementById('shareQrCanvas');
+    const closeShareBtn= document.getElementById('closeShareBtn');
 
     let stream   = null;
     let scanRaf  = null;
@@ -372,8 +457,8 @@
 
     // map: "AP1264-030-3" -> { id, key, label, probes }
     const viewerMap = {};
-    let fixturesCache = null; // кэш fixtures/list.json
-    let pendingProbes = null; // probes, которые надо вписать после загрузки fixture
+    let fixturesCache = null;
+    let pendingProbes = null; // probes, которые надо вписать после загрузки viewer
 
     function setRaw(text){
       rawBox.textContent = text;
@@ -382,30 +467,6 @@
 
     function setViewerMessage(msg){
       if (viewerInfo) viewerInfo.textContent = msg;
-    }
-
-    function resetViewerSelectBase(fixturesOptions){
-      viewerSelect.innerHTML = '';
-
-      // 1) choose... (первый, выбран по умолчанию)
-      const chooseOpt = document.createElement('option');
-      chooseOpt.value = '';
-      chooseOpt.textContent = 'choose...';
-      viewerSelect.appendChild(chooseOpt);
-      viewerSelect.value = '';
-
-      // 2) fixture-опции (если есть)
-      if (Array.isArray(fixturesOptions)) {
-        fixturesOptions.forEach(opt => {
-          viewerSelect.appendChild(opt);
-        });
-      }
-
-      // 3) manual selection (последний)
-      const manualOpt = document.createElement('option');
-      manualOpt.value = MANUAL_VALUE;
-      manualOpt.textContent = 'manual selection';
-      viewerSelect.appendChild(manualOpt);
     }
 
     function collectFixtureOptions(){
@@ -417,6 +478,28 @@
           c.textContent = o.textContent;
           return c;
         });
+    }
+
+    function resetViewerSelectBase(fixturesOptions){
+      viewerSelect.innerHTML = '';
+
+      // choose...
+      const chooseOpt = document.createElement('option');
+      chooseOpt.value = '';
+      chooseOpt.textContent = 'choose...';
+      viewerSelect.appendChild(chooseOpt);
+      viewerSelect.value = '';
+
+      // fixtures (если есть)
+      if (Array.isArray(fixturesOptions)) {
+        fixturesOptions.forEach(opt => viewerSelect.appendChild(opt));
+      }
+
+      // manual selection
+      const manualOpt = document.createElement('option');
+      manualOpt.value = MANUAL_VALUE;
+      manualOpt.textContent = 'manual selection';
+      viewerSelect.appendChild(manualOpt);
     }
 
     function clearViewerFromQR(){
@@ -438,9 +521,7 @@
       }
 
       Object.keys(viewerMap).forEach(k => delete viewerMap[k]);
-
       const fixturesOptions = collectFixtureOptions();
-
       const keys = Object.keys(obj);
       const qrOptions = [];
 
@@ -457,7 +538,6 @@
         });
       });
 
-      // пересобираем select: choose + QR + fixtures + manual
       viewerSelect.innerHTML = '';
 
       const chooseOpt = document.createElement('option');
@@ -473,9 +553,7 @@
         viewerSelect.appendChild(opt);
       });
 
-      fixturesOptions.forEach(opt => {
-        viewerSelect.appendChild(opt);
-      });
+      fixturesOptions.forEach(opt => viewerSelect.appendChild(opt));
 
       const manualOpt = document.createElement('option');
       manualOpt.value = MANUAL_VALUE;
@@ -487,59 +565,49 @@
     }
 
     function sendProbesToFixture(probes){
-  if (!viewerFrame || !viewerFrame.contentWindow) return;
-  try {
-    const doc = viewerFrame.contentWindow.document;
-    if (!doc) return;
-    const input = doc.getElementById('probeInput');
-    if (!input) return;
+      if (!viewerFrame || !viewerFrame.contentWindow) return;
+      try {
+        const doc = viewerFrame.contentWindow.document;
+        if (!doc) return;
+        const input = doc.getElementById('probeInput');
+        if (!input) return;
 
-    // ставим значение
-    input.value = probes;
+        input.value = probes;
 
-    // максимально имитируем ручной ввод
-    try {
-      const evInit = { bubbles: true, cancelable: true };
+        // максимально имитируем ручной ввод
+        try {
+          const evInit = { bubbles: true, cancelable: true };
+          input.dispatchEvent(new Event("input", evInit));
+          input.dispatchEvent(new Event("change", evInit));
+        } catch(e2){
+          const evtInput  = doc.createEvent("HTMLEvents");
+          evtInput.initEvent("input", true, true);
+          input.dispatchEvent(evtInput);
 
-      // событие input
-      input.dispatchEvent(new Event("input", evInit));
+          const evtChange = doc.createEvent("HTMLEvents");
+          evtChange.initEvent("change", true, true);
+          input.dispatchEvent(evtChange);
+        }
 
-      // событие change
-      input.dispatchEvent(new Event("change", evInit));
-    } catch(e2){
-      // fallback для старых движков (не должен понадобиться, но пусть будет)
-      const evtInput  = doc.createEvent("HTMLEvents");
-      evtInput.initEvent("input", true, true);
-      input.dispatchEvent(evtInput);
-
-      const evtChange = doc.createEvent("HTMLEvents");
-      evtChange.initEvent("change", true, true);
-      input.dispatchEvent(evtChange);
+      } catch (e) {
+        console.warn('Cannot access probeInput inside iframe:', e);
+      }
     }
-
-  } catch (e) {
-    console.warn('Cannot access probeInput inside iframe:', e);
-  }
-}
-
 
     function onViewerSelectChange(){
       const v = viewerSelect.value;
 
-      if (!v) {
-        // choose...
+      if (!v) { // choose...
         pendingProbes = null;
         return;
       }
 
       if (v === MANUAL_VALUE) {
-        // manual selection → popup, fixture выбор; viewer грузим, probes не трогаем
         openManualPopup();
         pendingProbes = null;
         return;
       }
 
-      // если это QR-элемент
       if (viewerMap[v]) {
         const item = viewerMap[v];
         const viewerPath = 'fixtures/' + item.key + '.html';
@@ -548,9 +616,7 @@
         if (viewerFrame.src !== viewerPath) {
           viewerFrame.src = viewerPath;
           setViewerMessage('Loaded viewer for ' + item.key + ', waiting for load to send probes.');
-          // probes уйдут после onload
         } else {
-          // файл уже загружен — можно отправить сразу
           sendProbesToFixture(item.probes);
           setViewerMessage('Sent probes to existing viewer: ' + item.key);
           pendingProbes = null;
@@ -558,14 +624,13 @@
         return;
       }
 
-      // иначе считаем, что это fixture (value = 'fixtures/<name>.html')
+      // fixture-опция
       pendingProbes = null;
       viewerFrame.src = v;
       setViewerMessage('Loaded fixture: ' + v);
     }
 
     /* === MANUAL POPUP === */
-
     function openManualPopup(){
       if (!manualPopup) return;
 
@@ -620,24 +685,22 @@
       closeManualPopup();
       const value = 'fixtures/' + fileName;
 
-      // убрать, если уже есть
+      // убираем, если уже есть
       Array.from(viewerSelect.options).forEach(opt => {
         if (opt.value === value) viewerSelect.removeChild(opt);
       });
 
-      // создать новую опцию с этим fixture
       const opt = document.createElement('option');
       opt.value = value;
       opt.textContent = fileName;
 
-      // вставить сразу после choose... (индекс 0)
       if (viewerSelect.children.length > 0) {
         viewerSelect.insertBefore(opt, viewerSelect.children[1] || null);
       } else {
         viewerSelect.appendChild(opt);
       }
 
-      // убедиться, что manual selection последним
+      // manual selection — последний
       let manualOpt = Array.from(viewerSelect.options).find(o => o.value === MANUAL_VALUE);
       if (!manualOpt) {
         manualOpt = document.createElement('option');
@@ -649,12 +712,10 @@
         viewerSelect.appendChild(manualOpt);
       }
 
-      // выбрать fixture и загрузить его
       viewerSelect.value = value;
       onViewerSelectChange();
     }
 
-    // клик вне popup — закрыть
     document.addEventListener('click', (e) => {
       if (!manualPopup) return;
       if (manualPopup.style.display !== 'block') return;
@@ -664,8 +725,7 @@
       closeManualPopup();
     });
 
-    /* === SCAN === */
-
+    /* === SCAN (JSON QR) === */
     function stopScan(){
       scanning = false;
       if (scanRaf) {
@@ -706,9 +766,9 @@
           });
           if (code && code.data) {
             const text = code.data;
-            setRaw(text);                   // сырые данные
-            buildViewerListFromJson(text);  // QR-опции в select
-            closeScanModal();               // закрыть окно сканера
+            setRaw(text);
+            buildViewerListFromJson(text);
+            closeScanModal();
             return;
           }
         }
@@ -717,9 +777,7 @@
     }
 
     async function startScan(){
-      if (scanning) {
-        return;
-      }
+      if (scanning) return;
 
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         alert('Camera access is not supported in this browser.');
@@ -749,18 +807,35 @@
       }
     }
 
+    /* === SHARE APP QR === */
+    function openShareModal(){
+      const url = "https://mikeavadyaev-sella1.github.io/fixture-viewer/";
+      const qr = new QRious({
+        element: shareQrCanvas,
+        value: url,
+        size: 240,
+        background: "#ffffff",
+        foreground: "#000000"
+      });
+      shareModal.style.display = 'flex';
+    }
+
+    function closeShareModal(){
+      shareModal.style.display = 'none';
+    }
+
+    /* === EXIT PWA === */
+    function exitApp(){
+      window.close();
+      setTimeout(() => {
+        history.go(-1);
+      }, 200);
+    }
+
     /* === EVENTS === */
-    menuScanBtn.addEventListener('click', () => {
-      openScanModal();
-    });
-
-    scanCloseBtn.addEventListener('click', () => {
-      closeScanModal();
-    });
-
-    scanStopBtn.addEventListener('click', () => {
-      closeScanModal();
-    });
+    btnScan.addEventListener('click', openScanModal);
+    scanCloseBtn.addEventListener('click', closeScanModal);
+    scanStopBtn.addEventListener('click', closeScanModal);
 
     viewerSelect.addEventListener('change', onViewerSelectChange);
 
@@ -768,7 +843,19 @@
       stopScan();
     });
 
-    // когда iframe загрузил fixture — если есть pendingProbes, отправляем их
+    btnShare.addEventListener('click', openShareModal);
+    closeShareBtn.addEventListener('click', closeShareModal);
+    shareModal.addEventListener('click', (e) => {
+      if (e.target === shareModal) closeShareModal();
+    });
+
+    btnExit.addEventListener('click', exitApp);
+
+    // начальное состояние select
+    resetViewerSelectBase([]);
+    setViewerMessage('No fixture loaded. Use manual selection to pick fixtures/<name>.html, then QR entries to send probes into probeInput.');
+
+    // probes после загрузки viewer
     viewerFrame.addEventListener('load', () => {
       if (pendingProbes != null) {
         sendProbesToFixture(pendingProbes);
@@ -776,24 +863,19 @@
         pendingProbes = null;
       }
     });
-
-    // начальное состояние: choose... + manual selection
-    resetViewerSelectBase([]);
-    setViewerMessage('No fixture loaded. Use manual selection to pick fixtures/<name>.html, then QR entries to send probes into probeInput.');
   </script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('./sw.js')
-        .catch(function (err) {
-          console.warn('SW registration failed:', err);
-        });
-    });
-  }
-</script>
-</body>
-</html>
 
+  <!-- регистрация service worker для PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('./sw.js')
+          .catch(function (err) {
+            console.warn('SW registration failed:', err);
+          });
+      });
+    }
+  </script>
 </body>
 </html>
 
