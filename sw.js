@@ -14,7 +14,7 @@
 //
 //  Новая версия = перекачиваются ВСЕ файлы приложения (чистое обновление)
 // ====================================================================
-const APP_VERSION    = 'fv-2025-11-17';       // ← МЕНЯЙ ЭТУ СТРОКУ
+const APP_VERSION    = 'fv-2025-11-18';       // ← МЕНЯЙ ЭТУ СТРОКУ
 const STATIC_CACHE   = 'fv-static-'   + APP_VERSION;
 const FIXTURES_CACHE = 'fv-fixtures-' + APP_VERSION;
 
