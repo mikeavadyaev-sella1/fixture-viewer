@@ -28,20 +28,19 @@
       background:radial-gradient(circle at top, #1e293b, #020617);
       font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
       color:var(--text);
-      display:flex;
-      justify-content:center;
-      padding:10px;
-      overflow:hidden;
+      padding:4px;              /* было 10px — сделали меньше */
+      overflow:auto;            /* вернули прокрутку */
+      display:block;            /* убрал flex, чтобы было естественное поведение */
     }
 
     .wrap{
       width:100%;
-      max-width:520px;
-      height:100vh;
-      overflow:hidden;
+      max-width:600px;          /* страница стала шире */
+      min-height:100vh;
+      margin:0 auto;
       display:flex;
       flex-direction:column;
-      gap:10px;
+      gap:8px;
       position:relative;
     }
 
@@ -50,7 +49,7 @@
       display:flex;
       flex-direction:column;
       gap:6px;
-      padding:6px 8px;
+      padding:6px 4px;          /* было 6px 8px — уменьшили по бокам */
       border-radius:14px;
       border:1px solid var(--border);
       background:rgba(15,23,42,0.95);
@@ -109,7 +108,7 @@
       border-radius:16px;
       border:1px solid var(--border);
       background:#111827;
-      padding:8px 8px 10px;
+      padding:8px 6px 10px;   /* чуть меньше по бокам */
       box-shadow:0 18px 40px rgba(0,0,0,.55);
       display:flex;
       flex-direction:column;
@@ -240,7 +239,7 @@
     .manual-popup{
       position:absolute;
       top:64px;
-      right:12px;
+      right:10px;
       min-width:220px;
       background:#020617;
       border:1px solid var(--border);
@@ -279,7 +278,7 @@
       background:#111827;
     }
 
-    /* === SHARE MODAL (QR с ссылкой на приложение) === */
+    /* === SHARE MODAL (QR ссылки на приложение) === */
     #shareModal{
       position:fixed;
       inset:0;
@@ -332,6 +331,21 @@
 
     #closeShareBtn:active{
       transform:translateY(1px);
+    }
+
+    /* версия внизу */
+    #appVersion{
+      position:fixed;
+      bottom:4px;
+      left:50%;
+      transform:translateX(-50%);
+      font-size:11px;
+      color:#64748b;
+      opacity:0.85;
+      user-select:none;
+      pointer-events:none;
+      text-align:center;
+      z-index:1600;
     }
   </style>
 
@@ -427,7 +441,13 @@
     </div>
   </div>
 
+  <!-- версия приложения -->
+  <div id="appVersion"></div>
+
   <script>
+    // версию надо менять вместе с APP_VERSION в sw.js
+    const APP_VERSION_STRING = 'fv-2025-11-18-02';
+
     const rawBox       = document.getElementById('rawBox');
     const scanModal    = document.getElementById('scanModal');
     const scanCloseBtn = document.getElementById('scanClose');
@@ -448,6 +468,9 @@
     const shareModal   = document.getElementById('shareModal');
     const shareQrCanvas= document.getElementById('shareQrCanvas');
     const closeShareBtn= document.getElementById('closeShareBtn');
+
+    const appVersionEl = document.getElementById('appVersion');
+    if (appVersionEl) appVersionEl.textContent = 'v ' + APP_VERSION_STRING;
 
     let stream   = null;
     let scanRaf  = null;
@@ -483,19 +506,16 @@
     function resetViewerSelectBase(fixturesOptions){
       viewerSelect.innerHTML = '';
 
-      // choose...
       const chooseOpt = document.createElement('option');
       chooseOpt.value = '';
       chooseOpt.textContent = 'choose...';
       viewerSelect.appendChild(chooseOpt);
       viewerSelect.value = '';
 
-      // fixtures (если есть)
       if (Array.isArray(fixturesOptions)) {
         fixturesOptions.forEach(opt => viewerSelect.appendChild(opt));
       }
 
-      // manual selection
       const manualOpt = document.createElement('option');
       manualOpt.value = MANUAL_VALUE;
       manualOpt.textContent = 'manual selection';
@@ -574,7 +594,6 @@
 
         input.value = probes;
 
-        // максимально имитируем ручной ввод
         try {
           const evInit = { bubbles: true, cancelable: true };
           input.dispatchEvent(new Event("input", evInit));
@@ -597,7 +616,7 @@
     function onViewerSelectChange(){
       const v = viewerSelect.value;
 
-      if (!v) { // choose...
+      if (!v) {
         pendingProbes = null;
         return;
       }
@@ -624,7 +643,6 @@
         return;
       }
 
-      // fixture-опция
       pendingProbes = null;
       viewerFrame.src = v;
       setViewerMessage('Loaded fixture: ' + v);
@@ -685,7 +703,6 @@
       closeManualPopup();
       const value = 'fixtures/' + fileName;
 
-      // убираем, если уже есть
       Array.from(viewerSelect.options).forEach(opt => {
         if (opt.value === value) viewerSelect.removeChild(opt);
       });
@@ -700,7 +717,6 @@
         viewerSelect.appendChild(opt);
       }
 
-      // manual selection — последний
       let manualOpt = Array.from(viewerSelect.options).find(o => o.value === MANUAL_VALUE);
       if (!manualOpt) {
         manualOpt = document.createElement('option');
@@ -810,7 +826,7 @@
     /* === SHARE APP QR === */
     function openShareModal(){
       const url = "https://mikeavadyaev-sella1.github.io/fixture-viewer/";
-      const qr = new QRious({
+      new QRious({
         element: shareQrCanvas,
         value: url,
         size: 240,
@@ -824,12 +840,17 @@
       shareModal.style.display = 'none';
     }
 
-    /* === EXIT PWA === */
+    /* === EXIT PWA ===
+       Из-за ограничений браузера полностью "убить" окно нельзя,
+       поэтому поведение = назад.
+    */
     function exitApp(){
+      // попытка закрыть окно (чаще всего игнорируется)
       window.close();
+      // fallback: шаг назад
       setTimeout(() => {
-        history.go(-1);
-      }, 200);
+        history.back();
+      }, 150);
     }
 
     /* === EVENTS === */
@@ -878,4 +899,3 @@
   </script>
 </body>
 </html>
-
